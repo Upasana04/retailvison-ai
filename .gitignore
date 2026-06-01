@@ -1,0 +1,27 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Environment Variables
+.env
+
+# Videos & Datasets (challenge requirement)
+videos/
+datasets/
+*.mp4
+*.avi
+*.mov
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
