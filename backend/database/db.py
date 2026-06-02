@@ -1,6 +1,13 @@
+import os
 import sqlite3
 
-conn = sqlite3.connect("store.db")
+db_path = os.path.join(
+    os.path.dirname(__file__),
+    "..",
+    "store.db"
+)
+
+conn = sqlite3.connect(db_path)
 
 cursor = conn.cursor()
 
@@ -15,3 +22,5 @@ CREATE TABLE IF NOT EXISTS events(
 """)
 
 conn.commit()
+
+print("Events table created successfully")

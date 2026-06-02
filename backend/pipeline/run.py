@@ -10,8 +10,9 @@ import cv2
 
 from detect import detect_people
 from tracker import track_people
-
+from events.event_generator import generate_event
 from events.zone_detector import get_zone
+from database.save_event import save_event
 
 video_path = "../videos/CAM 1.mp4"
 
@@ -47,6 +48,13 @@ while True:
         # Detect zone
         zone = get_zone(center_x, center_y)
 
+        events = generate_event(track_id, zone)
+
+        for event in events:
+            print(event)
+            save_event(event)
+        
+        
         cv2.rectangle(
             frame,
             (x1, y1),
