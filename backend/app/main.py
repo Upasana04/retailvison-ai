@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 import os
 
@@ -6,6 +7,15 @@ app = FastAPI(
     title="RetailVision AI",
     description="Store Intelligence System",
     version="1.0"
+)
+
+# CORS for React Frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 DB_PATH = os.path.join(
@@ -22,12 +32,11 @@ def home():
     }
 
 
-@app.get("/events")
+
 @app.get("/metrics")
 def get_metrics():
 
     conn = sqlite3.connect(DB_PATH)
-
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -57,10 +66,13 @@ def get_metrics():
         "entries": total_entries,
         "zone_transitions": zone_transitions
     }
+
+
+
+@app.get("/events")
 def get_events():
 
     conn = sqlite3.connect(DB_PATH)
-
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -82,17 +94,19 @@ def get_events():
         "count": len(rows),
         "events": rows
     }
+
+
 @app.get("/visitor/{visitor_id}")
 def visitor_journey(visitor_id: str):
 
     conn = sqlite3.connect(DB_PATH)
-
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT event_type,
-               zone,
-               timestamp
+        SELECT
+            event_type,
+            zone,
+            timestamp
         FROM events
         WHERE visitor_id = ?
         ORDER BY id
@@ -106,16 +120,18 @@ def visitor_journey(visitor_id: str):
         "visitor_id": visitor_id,
         "journey": rows
     }
+
+
 @app.get("/heatmap")
 def heatmap():
 
     conn = sqlite3.connect(DB_PATH)
-
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT zone,
-               COUNT(*)
+        SELECT
+            zone,
+            COUNT(*)
         FROM events
         GROUP BY zone
     """)
@@ -127,7 +143,8 @@ def heatmap():
     return {
         "zone_activity": rows
     }
-    
+
+
 @app.get("/funnel")
 def funnel():
 
@@ -163,7 +180,8 @@ def funnel():
         "cash_counter_visitors": cash_counter,
         "conversion_rate": conversion_rate
     }
-    
+
+
 @app.get("/anomalies")
 def anomalies():
 
@@ -171,8 +189,9 @@ def anomalies():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT visitor_id,
-               COUNT(*)
+        SELECT
+            visitor_id,
+            COUNT(*)
         FROM events
         GROUP BY visitor_id
         HAVING COUNT(*) > 5
