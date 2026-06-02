@@ -127,3 +127,61 @@ def heatmap():
     return {
         "zone_activity": rows
     }
+    
+@app.get("/funnel")
+def funnel():
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT COUNT(DISTINCT visitor_id)
+        FROM events
+        WHERE event_type='ENTRY'
+    """)
+    entries = cursor.fetchone()[0]
+
+    cursor.execute("""
+        SELECT COUNT(DISTINCT visitor_id)
+        FROM events
+        WHERE zone='CASH_COUNTER'
+    """)
+    cash_counter = cursor.fetchone()[0]
+
+    conn.close()
+
+    conversion_rate = 0
+
+    if entries > 0:
+        conversion_rate = round(
+            (cash_counter / entries) * 100,
+            2
+        )
+
+    return {
+        "entries": entries,
+        "cash_counter_visitors": cash_counter,
+        "conversion_rate": conversion_rate
+    }
+    
+@app.get("/anomalies")
+def anomalies():
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT visitor_id,
+               COUNT(*)
+        FROM events
+        GROUP BY visitor_id
+        HAVING COUNT(*) > 5
+    """)
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return {
+        "suspicious_visitors": rows
+    }
