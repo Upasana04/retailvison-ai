@@ -1,105 +1,109 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid
+} from "recharts";
 
 function App() {
   const [metrics, setMetrics] = useState({});
-  const [funnel, setFunnel] = useState({});
-  const [events, setEvents] = useState([]);
   const [heatmap, setHeatmap] = useState([]);
+  const [funnel, setFunnel] = useState({});
   const [anomalies, setAnomalies] = useState([]);
+  const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    loadData();
+    axios.get("http://127.0.0.1:8000/metrics")
+      .then(res => setMetrics(res.data));
+
+    axios.get("http://127.0.0.1:8000/heatmap")
+      .then(res => {
+        const data = res.data.zone_activity.map(
+          item => ({
+            zone: item[0],
+            count: item[1]
+          })
+        );
+        setHeatmap(data);
+      });
+
+    axios.get("http://127.0.0.1:8000/funnel")
+      .then(res => setFunnel(res.data));
+
+    axios.get("http://127.0.0.1:8000/anomalies")
+      .then(res => setAnomalies(res.data.suspicious_visitors));
+
+    axios.get("http://127.0.0.1:8000/events")
+      .then(res => setEvents(res.data.events));
   }, []);
 
-  const loadData = async () => {
-    try {
-      const metricsRes = await axios.get("http://127.0.0.1:8000/metrics");
-      const funnelRes = await axios.get("http://127.0.0.1:8000/funnel");
-      const eventsRes = await axios.get("http://127.0.0.1:8000/events");
-      const heatmapRes = await axios.get("http://127.0.0.1:8000/heatmap");
-      const anomalyRes = await axios.get("http://127.0.0.1:8000/anomalies");
-
-      setMetrics(metricsRes.data);
-      setFunnel(funnelRes.data);
-      setEvents(eventsRes.data.events || []);
-      setHeatmap(heatmapRes.data.zone_activity || []);
-      setAnomalies(anomalyRes.data.suspicious_visitors || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
+    <div style={{ padding: 20 }}>
       <h1>RetailVision AI Dashboard</h1>
-
-      <div style={{ display: "flex", gap: "20px" }}>
-        <div style={{ border: "1px solid gray", padding: "10px" }}>
-          <h3>Total Visitors</h3>
-          <p>{metrics.total_visitors}</p>
-        </div>
-
-        <div style={{ border: "1px solid gray", padding: "10px" }}>
-          <h3>Entries</h3>
-          <p>{funnel.entries}</p>
-        </div>
-
-        <div style={{ border: "1px solid gray", padding: "10px" }}>
-          <h3>Conversion Rate</h3>
-          <p>{funnel.conversion_rate}%</p>
-        </div>
-      </div>
 
       <hr />
 
-      <h2>Zone Activity</h2>
+      <h2>Metrics</h2>
 
-      {heatmap.map((item, index) => (
-        <p key={index}>
-          {item[0]} : {item[1]}
-        </p>
+      <p>Total Visitors: {metrics.total_visitors}</p>
+      <p>Entries: {metrics.entries}</p>
+      <p>Zone Transitions: {metrics.zone_transitions}</p>
+
+      <hr />
+
+      <h2>Heatmap</h2>
+
+      <BarChart
+        width={700}
+        height={300}
+        data={heatmap}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="zone" />
+        <YAxis />
+        <Tooltip />
+        <Bar dataKey="count" />
+      </BarChart>
+
+      <hr />
+
+      <h2>Conversion Funnel</h2>
+
+      <p>Entries: {funnel.entries}</p>
+
+      <p>
+        Cash Counter Visitors:
+        {funnel.cash_counter_visitors}
+      </p>
+
+      <p>
+        Conversion Rate:
+        {funnel.conversion_rate}%
+      </p>
+
+      <hr />
+
+      <h2>Anomaly Detection</h2>
+
+      {anomalies.map((a, index) => (
+        <div key={index}>
+          Visitor {a[0]} → {a[1]} events
+        </div>
       ))}
 
       <hr />
 
       <h2>Recent Events</h2>
 
-      <table border="1" cellPadding="5">
-        <thead>
-          <tr>
-            <th>Visitor</th>
-            <th>Event</th>
-            <th>Zone</th>
-            <th>Timestamp</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {events.slice(0, 20).map((event, index) => (
-            <tr key={index}>
-              <td>{event[0]}</td>
-              <td>{event[1]}</td>
-              <td>{event[2]}</td>
-              <td>{event[3]}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <hr />
-
-      <h2>Anomaly Detection</h2>
-
-      {anomalies.length === 0 ? (
-        <p>No suspicious visitors found.</p>
-      ) : (
-        anomalies.map((visitor, index) => (
-          <p key={index}>
-            Visitor {visitor[0]} → {visitor[1]} events
-          </p>
-        ))
-      )}
+      {events.slice(0, 20).map((e, index) => (
+        <div key={index}>
+          {e[0]} | {e[1]} | {e[2]}
+        </div>
+      ))}
     </div>
   );
 }
