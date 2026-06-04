@@ -1,0 +1,8 @@
+{"visitor_id": "1", "event_type": "ENTRY", "zone": "EXIT", "timestamp": "2026-06-04T18:59:20.658180"}
+{"visitor_id": "2", "event_type": "ENTRY", "zone": "MAKEUP_AREA", "timestamp": "2026-06-04T18:59:20.672556"}
+{"visitor_id": "2", "event_type": "ZONE_EXIT", "zone": "MAKEUP_AREA", "timestamp": "2026-06-04T18:59:36.597137"}
+{"visitor_id": "2", "event_type": "ZONE_ENTER", "zone": "CASH_COUNTER", "timestamp": "2026-06-04T18:59:36.597137"}
+{"visitor_id": "1", "event_type": "ZONE_EXIT", "zone": "EXIT", "timestamp": "2026-06-04T18:59:38.950820"}
+{"visitor_id": "1", "event_type": "ZONE_ENTER", "zone": "CASH_COUNTER", "timestamp": "2026-06-04T18:59:38.950820"}
+{"visitor_id": "1", "event_type": "ZONE_EXIT", "zone": "CASH_COUNTER", "timestamp": "2026-06-04T18:59:44.800405"}
+{"visitor_id": "1", "event_type": "ZONE_ENTER", "zone": "EXIT", "timestamp": "2026-06-04T18:59:44.800405"}

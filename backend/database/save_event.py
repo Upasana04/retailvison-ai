@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import json
 
 def save_event(event):
 
@@ -33,3 +34,13 @@ def save_event(event):
 
     conn.commit()
     conn.close()
+
+    # Save event to JSONL file
+    jsonl_path = os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "events.jsonl"
+    )
+
+    with open(jsonl_path, "a") as f:
+        f.write(json.dumps(event) + "\n")
