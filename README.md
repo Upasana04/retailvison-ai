@@ -1,8 +1,7 @@
 # RetailVision AI
 
 ## Overview
-
-RetailVision AI is a store intelligence system that analyzes CCTV footage to generate visitor analytics.
+cd
 
 Features:
 
