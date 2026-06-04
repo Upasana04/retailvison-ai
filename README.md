@@ -45,6 +45,7 @@ Frontend:
 ```bash
 cd backend
 venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
 ### 2. Run Detection Pipeline
